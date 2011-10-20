@@ -2,13 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package filecypher;
+package cipher;
 
 /**
  *
  * @author MLopes
  */
-public class FileCypher {
+public class mainCipher {
 
     /**
      * @param args the command line arguments
