@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.cert.Certificate;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -29,10 +28,10 @@ public class KeyGetter {
         return keyStore;
     }
     //"X.509"
-    public Key GetPublicKey(String FilePath, String CertificateType) throws CertificateException, FileNotFoundException{
+    public Certificate GetPublicCertificate(String FilePath, String CertificateType) throws CertificateException, FileNotFoundException{
         CertificateFactory Certfactory = CertificateFactory.getInstance(CertificateType);  
         Certificate generateCertificate = (Certificate)Certfactory.generateCertificate(new FileInputStream(FilePath));
-        return generateCertificate.getPublicKey();
+        return generateCertificate;
     }
     
 }

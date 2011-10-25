@@ -23,24 +23,33 @@ public class FileCipher implements IFileCipher {
     private String _algorithm;
     private Cipher _cipher;
     private int MAXBYTES;
+    private int _count;
     
     public FileCipher(String Algorithm) {
         _algorithm = Algorithm;
         MAXBYTES = 1024;
+        _count = 0;
+    }
+
+    public FileCipher() {
+        MAXBYTES = 1024;
+        _count = 0;
     }
     
-    private byte[] CripherDecipher(byte[] input){
+    public byte[] CripherDecipher(byte[] input){
         for(int idx = 0; idx < input.length; idx+=MAXBYTES){
-        if((idx + MAXBYTES) >= input.length){
+        if(input.length < MAXBYTES){
             try {
-                return _cipher.doFinal(input, idx, MAXBYTES);
+                _count += input.length;
+                return _cipher.doFinal(input, idx, input.length);
             } catch (IllegalBlockSizeException ex) {
                 Logger.getLogger(FileCipher.class.getName()).log(Level.SEVERE, null, ex);
             } catch (BadPaddingException ex) {
                 Logger.getLogger(FileCipher.class.getName()).log(Level.SEVERE, null, ex);
             }
             }
-            _cipher.update(input,idx,MAXBYTES);
+            _count += MAXBYTES;
+            return _cipher.update(input,idx,MAXBYTES);
         }    
         return null;
     }
@@ -48,7 +57,7 @@ public class FileCipher implements IFileCipher {
     
     
     @Override
-    public byte[] Get(byte[] input, Key Key) {
+    public void GetInit(Key Key) {
         if(_algorithm == null) throw new IllegalStateException("Algorithm must be defined.");
         try {
             _cipher = Cipher.getInstance(_algorithm);
@@ -60,12 +69,11 @@ public class FileCipher implements IFileCipher {
         } catch (NoSuchPaddingException ex) {
             Logger.getLogger(FileCipher.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return CripherDecipher(input);
     }
 
     @Override
-    public byte[] Set(byte[] input, Key Key) {
-                if(_algorithm == null) throw new IllegalStateException("Algorithm must be defined.");
+    public void SetInit(Key Key) {
+        if(_algorithm == null) throw new IllegalStateException("Algorithm must be defined.");
         try {
             _cipher = Cipher.getInstance(_algorithm);
             _cipher.init(Cipher.ENCRYPT_MODE , Key);
@@ -76,12 +84,16 @@ public class FileCipher implements IFileCipher {
         } catch (NoSuchPaddingException ex) {
             Logger.getLogger(FileCipher.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return CripherDecipher(input);
     }
-
+    
     @Override
     public void SetAlgorithm(String Algorithm) {
         _algorithm = Algorithm;
+    }
+
+    @Override
+    public int GetSize() {
+        return _count;
     }
 
     

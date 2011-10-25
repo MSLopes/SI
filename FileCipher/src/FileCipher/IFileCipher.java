@@ -11,7 +11,9 @@ import java.security.Key;
  * @author MLopes
  */
 public interface IFileCipher {
-    byte[] Get (byte[] input ,Key Key);
-    byte[] Set (byte[] input , Key Key);
+    void GetInit (Key Key);
+    void SetInit (Key Key);
     void SetAlgorithm(String Algorithm);
+    public byte[] CripherDecipher(byte[] input);
+    public int GetSize();
 }
