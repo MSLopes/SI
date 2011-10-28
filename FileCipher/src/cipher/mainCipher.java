@@ -45,7 +45,7 @@ public class mainCipher {
     private static String _password;
         
     public static void main(String[] args) throws CertificateException, FileNotFoundException, IOException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnrecoverableEntryException {
-        if(args.length < 4) throw new IllegalArgumentException("Arguments missing -> Key_Path Certificate_Type File_Path Operation  [File_Path_Metadata] [File_Path_Secret] [KeyStore_Password] [Key_Generator_Algorithm]");
+        if(args.length < 4) throw new IllegalArgumentException("Arguments missing -> Key_Path Certificate_Type File_Path Operation  [Intermediate_Certificate_Path/File_Path_Metadata] [Trust_Anchor_Path/File_Path_Secret] [KeyStore_Password] [Key_Generator_Algorithm]");
         _filePath = args[2];
         _keyPath = args[0];
         _operation = args[3];
@@ -59,8 +59,9 @@ public class mainCipher {
         _fso = new FileStreamOps();
         if(_operation.equals("cipher")){
             Key k = new KeyGeneratorCipher().GetKey(_keyGenAlgorithm);
-            Certificate cert = new KeyGetter().GetPublicCertificate(_keyPath, _certType);
-            if(! new ValidateCertChain().Validate(cert)) throw new CertificateException("Invalid Certificate");
+            KeyGetter kg = new KeyGetter();
+            Certificate cert = kg.GetPublicCertificate(_keyPath, _certType);
+            if(! new ValidateCertChain().Validate(cert,_filePathMetadata,kg.GetKeyStore(_filePathSecret, _password, "JKS") )) throw new CertificateException("Invalid Certificate");
             _ff.SetCipheredSimetricKey(new KeyCipher(cert.getPublicKey().getAlgorithm()).Set(k, cert));
             _ff.SetPublicCertificate(cert);
             _fc.SetAlgorithm(k.getAlgorithm());
